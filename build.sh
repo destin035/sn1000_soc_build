@@ -65,3 +65,13 @@ pushd build/kernel && quilt push -a && popd
 cp build/kernel/patches/config-lx2162au26z build/kernel/arch/arm64/configs/lx2162au26z_defconfig
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-destin make -C build/kernel lx2162au26z_defconfig
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-destin make -C build/kernel -j 20
+
+# buildroot
+mkdir -p build/buildroot
+tar xvf downloads/buildroot_2020.02.3.tgz -C build/buildroot
+tar xvf downloads/buildroot-dl.tgz -C build/buildroot
+cp -r patches/buildroot/2020.02.3 build/buildroot/patches
+cp build/buildroot/patches/series-lx2162a build/buildroot/patches/series
+pushd build/buildroot && quilt push -a && popd
+FORCE_UNSAFE_CONFIGURE=1 make -C build/buildroot defconfig BR2_DEFCONFIG=patches/config-lx2162a
+FORCE_UNSAFE_CONFIGURE=1 make -C build/buildroot -j 20

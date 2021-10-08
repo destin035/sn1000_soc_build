@@ -1,12 +1,10 @@
 ## 构建机环境准备
 
-1. 安装依赖包
-
-ubuntu 20.04
+1. 安装依赖包 (Ubuntu 20.04)
 
 ```
 sudo apt update
-sudo apt install git quilt wget build-essential gcc-aarch64-linux-gnu rsync device-tree-compiler tcl
+sudo apt install git quilt wget build-essential gcc-aarch64-linux-gnu rsync device-tree-compiler tcl unzip
 ```
 
 2. 下载这个项目
@@ -88,7 +86,7 @@ CROSS_COMPILE=aarch64-linux-gnu- make -C build/atf PLAT=lx2162au26z all \
 	pbl RCW=$PWD/build/rcw/lx2162au26z/NNNN_NNNN_PPPP_PPPP_RR_0_2/rcw_2000_600_2900_0_2.bin
 ```
 
-## 制作启动镜像
+## 制作启动镜像 (u-boot)
 
 ```
 mkdir -p build/images
@@ -115,6 +113,8 @@ make -f image.mk \
 	DDR_BIN=build/ddr-phy-binary/lx2160a/fip_ddr.bin
 ```
 
+使用 xnsocadmin 工具将 `build/images/boot_xspi.img` 写入 arm soc 的 flash
+
 ## kernel
 
 ```
@@ -126,4 +126,17 @@ pushd build/kernel && quilt push -a && popd
 cp build/kernel/patches/config-lx2162au26z build/kernel/arch/arm64/configs/lx2162au26z_defconfig
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-destin make -C build/kernel lx2162au26z_defconfig
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-destin make -C build/kernel -j 20
+```
+
+## buildroot
+
+```
+mkdir -p build/buildroot
+tar xvf downloads/buildroot_2020.02.3.tgz -C build/buildroot
+tar xvf downloads/buildroot-dl.tgz -C build/buildroot
+cp -r patches/buildroot/2020.02.3 build/buildroot/patches
+cp build/buildroot/patches/series-lx2162a build/buildroot/patches/series
+pushd build/buildroot && quilt push -a && popd
+FORCE_UNSAFE_CONFIGURE=1 make -C build/buildroot defconfig BR2_DEFCONFIG=patches/config-lx2162a
+FORCE_UNSAFE_CONFIGURE=1 make -C build/buildroot -j 20
 ```
