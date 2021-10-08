@@ -140,3 +140,14 @@ pushd build/buildroot && quilt push -a && popd
 FORCE_UNSAFE_CONFIGURE=1 make -C build/buildroot defconfig BR2_DEFCONFIG=patches/config-lx2162a
 FORCE_UNSAFE_CONFIGURE=1 make -C build/buildroot -j 20
 ```
+
+## 术语
+
+| 缩写 | 描述 |
+|------|------|
+| PBL | Pre-Boot Loader |
+| RCW | Reset Configuration Word |
+| FIP | Firmware Image Package |
+| DPAA | Data Path Acceleration Architecture |
+| DPC | Data Path Control |
+| DPL | Data Path Layout |
