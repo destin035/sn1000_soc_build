@@ -1,31 +1,8 @@
-## 构建机环境准备
+#!/bin/bash
 
-1. 安装依赖包
+rm -rf build
 
-ubuntu 20.04
-
-```
-sudo apt update
-sudo apt install git quilt wget build-essential gcc-aarch64-linux-gnu rsync device-tree-compiler tcl
-```
-
-2. 下载这个项目
-
-```
-git clone https://github.com/destin035/sn1000_soc_build.git
-cd sn1000_soc_build
-```
-
-3. 获取源码压缩包
-
-```
-wget http://10.10.30.24:8088/s/XnHLYJ79MwSTp6j/download/sn1000_soc_downloads.tar.gz
-tar xvf sn1000_soc_downloads.tar.gz
-```
-
-## u-boot
-
-```
+# u-boot
 mkdir -p build/u-boot
 tar xvf downloads/u-boot_lx2162a-bsp0.4.tgz -C build/u-boot
 cp -r patches/u-boot/lx2162a-bsp0.4 build/u-boot/patches
@@ -34,49 +11,32 @@ pushd build/u-boot && quilt push -a && popd
 cp build/u-boot/patches/config-lx2162au26z build/u-boot/configs/lx2162a-lx2162au26z_custom_defconfig
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z make -C build/u-boot lx2162a-lx2162au26z_custom_defconfig
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z make -C build/u-boot -j 20
-```
 
-## mc
-
-```
+# mc
 mkdir -p build/mc
 tar xvf downloads/mc_lx2162a-bsp0.4.tgz -C build/mc
-```
 
-## mc-utils
-
-```
+# mc-utils
 mkdir -p build/mc-utils
 tar xvf downloads/mc-utils_lx2162a-bsp0.4.tgz -C build/mc-utils
 cp -r patches/mc-utils/lx2162a-bsp0.4 build/mc-utils/patches
 cp build/mc-utils/patches/series-lx2162au26z build/mc-utils/patches/series
 pushd build/mc-utils && quilt push -a && popd
 SOURCEDIR=. make -C build/mc-utils/config
-```
 
-## rcw
-
-```
+# rcw
 mkdir -p build/rcw
 tar xvf downloads/rcw_lx2162a-bsp0.4.tgz -C build/rcw
 cp -r patches/rcw/lx2162a-bsp0.4 build/rcw/patches
 cp build/rcw/patches/series-lx2162a build/rcw/patches/series
 pushd build/rcw && quilt push -a && popd
 make -C build/rcw -j 20
-```
 
-## ddr
-
-```
+# ddr
 mkdir -p build/ddr-phy-binary
 tar xvf downloads/ddr_lx2162a-bsp0.4.tgz -C build/ddr-phy-binary
-```
 
-## atf
-
-https://trustedfirmware-a.readthedocs.io/en/latest/getting_started/build-options.html
-
-```
+# atf
 mkdir -p build/atf
 tar xvf downloads/atf_lx2162a-bsp0.4.tgz -C build/atf
 cp -r patches/atf/lx2162a-bsp0.4 build/atf/patches
@@ -86,11 +46,8 @@ CROSS_COMPILE=aarch64-linux-gnu- make -C build/atf realclean
 CROSS_COMPILE=aarch64-linux-gnu- make -C build/atf PLAT=lx2162au26z all \
 	fip BOOT_MODE=flexspi_nor BL33=$PWD/build/u-boot/u-boot.bin \
 	pbl RCW=$PWD/build/rcw/lx2162au26z/NNNN_NNNN_PPPP_PPPP_RR_0_2/rcw_2000_600_2900_0_2.bin
-```
 
-## 制作启动镜像
-
-```
+# 制作启动镜像
 mkdir -p build/images
 IMAGE=build/images/boot_xspi.img
 rm -f $IMAGE
@@ -98,19 +55,3 @@ rm -f $IMAGE
 dd if=build/atf/build/lx2162au26z/release/bl2_flexspi_nor.pbl of=$IMAGE bs=1024 seek=0
 dd if=build/atf/build/lx2162au26z/release/fip.bin of=$IMAGE bs=1024 seek=1024
 dd if=build/ddr-phy-binary/lx2160a/fip_ddr.bin of=$IMAGE bs=1024 seek=2048
-```
-
-或者
-
-```
-mkdir -p build/images
-IMAGE=build/images/boot_xspi.img
-rm -f $IMAGE
-
-make -f image.mk \
-	BOOT=XSPI \
-	IMAGE=$IMAGE \
-	PBL=build/atf/build/lx2162au26z/release/bl2_flexspi_nor.pbl \
-	FIP=build/atf/build/lx2162au26z/release/fip.bin \
-	DDR_BIN=build/ddr-phy-binary/lx2160a/fip_ddr.bin
-```
