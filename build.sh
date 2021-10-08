@@ -55,3 +55,13 @@ rm -f $IMAGE
 dd if=build/atf/build/lx2162au26z/release/bl2_flexspi_nor.pbl of=$IMAGE bs=1024 seek=0
 dd if=build/atf/build/lx2162au26z/release/fip.bin of=$IMAGE bs=1024 seek=1024
 dd if=build/ddr-phy-binary/lx2160a/fip_ddr.bin of=$IMAGE bs=1024 seek=2048
+
+# kernel
+mkdir -p build/kernel
+tar xvf downloads/kernel_lx2162a-bsp0.4.tgz -C build/kernel
+cp -r patches/kernel/lx2162a-bsp0.4 build/kernel/patches
+cp build/kernel/patches/series-lx2162a build/kernel/patches/series
+pushd build/kernel && quilt push -a && popd
+cp build/kernel/patches/config-lx2162au26z build/kernel/arch/arm64/configs/lx2162au26z_defconfig
+ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-destin make -C build/kernel lx2162au26z_defconfig
+ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-destin make -C build/kernel -j 20
