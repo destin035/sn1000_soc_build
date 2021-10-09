@@ -93,3 +93,28 @@ tar xvf downloads/buildroot-dl.tgz -C build/buildroot
 cp -r patches/buildroot/2020.02.3 build/buildroot/patches
 FORCE_UNSAFE_CONFIGURE=1 make -C build/buildroot defconfig BR2_DEFCONFIG=patches/config-lx2162a
 FORCE_UNSAFE_CONFIGURE=1 make -C build/buildroot -j 20
+
+# 制作 initramfs
+cat > build/make_initramfs << EOF
+cpio -i -d -H newc -F $PWD/build/buildroot/output/images/rootfs.cpio --no-absolute-filenames
+echo "sfc" >> /etc/modules
+mkdir -p lib/modules/5.4.3-destin
+cp $PWD/build/linux-modules/lib/modules/5.4.3-destin/modules.* lib/modules/5.4.3-destin
+mkdir -p lib/modules/5.4.3-destin/kernel/drivers/net/ethernet/sfc
+cp $PWD/build/linux-modules/lib/modules/5.4.3-destin/kernel/drivers/net/ethernet/sfc/*.ko lib/modules/5.4.3-destin/kernel/drivers/net/ethernet/sfc
+/sbin/depmod -ae -b . -F $PWD/build/kernel/System.map 5.4.3-destin
+chown -R root:root lib
+find . | cpio -o -H newc | gzip > $PWD/build/images/initramfs.cpio.gz
+EOF
+rm -rf build/initramfs
+mkdir -p build/initramfs
+chmod +x build/make_initramfs
+pushd build/initramfs && fakeroot ../make_initramfs && popd
+
+# 合并 initramfs 到内核镜像
+ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-destin \
+	make -C build/kernel \
+	CONFIG_INITRAMFS_SOURCE=$PWD/build/images/initramfs.cpio.gz \
+	CONFIG_INITRAMFS_COMPRESSION_GZIP=y Image Image.gz
+
+cp build/kernel/arch/arm64/boot/Image.gz build/images/zImageInitramfs
