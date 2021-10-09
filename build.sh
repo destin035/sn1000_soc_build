@@ -53,8 +53,8 @@ IMAGE=build/images/boot_xspi.img
 rm -f $IMAGE
 
 dd if=build/atf/build/lx2162au26z/release/bl2_flexspi_nor.pbl of=$IMAGE bs=1024 seek=0
-dd if=build/atf/build/lx2162au26z/release/fip.bin of=$IMAGE bs=1024 seek=1024
-dd if=build/ddr-phy-binary/lx2160a/fip_ddr.bin of=$IMAGE bs=1024 seek=2048
+dd if=build/atf/build/lx2162au26z/release/fip.bin             of=$IMAGE bs=1024 seek=1024
+dd if=build/ddr-phy-binary/lx2160a/fip_ddr.bin                of=$IMAGE bs=1024 seek=2048
 
 # kernel
 mkdir -p build/kernel
@@ -118,3 +118,62 @@ ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-dest
 	CONFIG_INITRAMFS_COMPRESSION_GZIP=y Image Image.gz
 
 cp build/kernel/arch/arm64/boot/Image.gz build/images/zImageInitramfs
+
+# 制作 FIT 镜像 (recovery)
+
+cat > build/kernel-initramfs.its << EOF
+/dts-v1/;
+/ {
+    description = "arm64 kernel, ramdisk and FDT blob";
+    images {
+        kernel {
+                description = "ARM64 Kernel";
+                data = /incbin/("$PWD/build/images/zImageInitramfs");
+                type = "kernel";
+                arch = "arm64";
+                os = "linux";
+                compression = "gzip";
+                load = <0x80080000>;
+                entry = <0x80080000>;
+                hash@1 {
+                    algo = "crc32";
+                };
+        };
+        lx2162au26z-dtb {
+            description = "lx2162au26z-dtb";
+            data = /incbin/("$PWD/build/kernel/arch/arm64/boot/dts/freescale/fsl-lx2162a-u26z-m.dtb");
+            type = "flat_dt";
+            arch = "arm64";
+            os = "linux";
+            compression = "none";
+            load = <0x90000000>;
+            hash@1 {
+                algo = "crc32";
+            };
+        };
+    };
+    configurations {
+        default = "lx2162au26z";
+        lx2162au26z {
+            description = "config for lx2162au26z";
+            kernel = "kernel";
+            fdt = "lx2162au26z-dtb";
+        };
+    };
+};
+EOF
+
+mkimage -f build/kernel-initramfs.its build/images/kernel-initramfs.itb
+
+# 制作启动镜像 (u-boot + recovery)
+
+mkdir -p build/images
+IMAGE=build/images/boot_xspi_recovery.img
+rm -f $IMAGE
+dd if=build/atf/build/lx2162au26z/release/bl2_flexspi_nor.pbl of=$IMAGE bs=1024 seek=0
+dd if=build/atf/build/lx2162au26z/release/fip.bin             of=$IMAGE bs=1024 seek=1024
+dd if=build/ddr-phy-binary/lx2160a/fip_ddr.bin                of=$IMAGE bs=1024 seek=2048
+dd if=build/mc/lx216xa/mc_10.25.0_lx2160a.itb                 of=$IMAGE bs=1024 seek=10240
+dd if=build/mc-utils/config/lx2162a/U26Z/dpl_1G.dtb           of=$IMAGE bs=1024 seek=13312
+dd if=build/mc-utils/config/lx2162a/U26Z/dpc_1G.dtb           of=$IMAGE bs=1024 seek=14336
+dd if=build/images/kernel-initramfs.itb                       of=$IMAGE bs=1024 seek=16384
