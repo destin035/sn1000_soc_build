@@ -128,6 +128,12 @@ ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-dest
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-destin make -C build/kernel -j 20
 ```
 
+拷贝编译出的内核镜像文件 `build/kernel/arch/arm64/boot/Image.gz`，可作为从 emmc 启动的内核
+
+```
+cp build/kernel/arch/arm64/boot/Image.gz build/images/zImageBoot
+```
+
 ## kernel modules
 
 ```
@@ -165,6 +171,16 @@ FORCE_UNSAFE_CONFIGURE=1 make -C build/buildroot -j 20
 
 构建时间比较久，完成后输出镜像文件 `build/buildroot/output/images/rootfs.cpio`
 
+## 制作 initramfs
+
+## 合并 initramfs 到内核镜像
+
+## 制作 FIT 镜像 (recovery)
+
+## 制作启动镜像 (u-boot + recovery)
+
+## 制作 emmc 镜像 (ubuntu 20.04)
+
 ## 术语
 
 | 缩写 | 描述 |
@@ -175,3 +191,4 @@ FORCE_UNSAFE_CONFIGURE=1 make -C build/buildroot -j 20
 | DPAA | Data Path Acceleration Architecture |
 | DPC | Data Path Control |
 | DPL | Data Path Layout |
+| FIT | Flattened uImage Tree |

@@ -66,6 +66,8 @@ cp build/kernel/patches/config-lx2162au26z build/kernel/arch/arm64/configs/lx216
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-destin make -C build/kernel lx2162au26z_defconfig
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-destin make -C build/kernel -j 20
 
+cp build/kernel/arch/arm64/boot/Image.gz build/images/zImageBoot
+
 # kernel modules
 mkdir -p build/linux-modules
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-destin make -C build/kernel -j 20 modules
