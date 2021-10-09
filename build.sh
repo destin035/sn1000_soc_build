@@ -71,7 +71,5 @@ mkdir -p build/buildroot
 tar xvf downloads/buildroot_2020.02.3.tgz -C build/buildroot
 tar xvf downloads/buildroot-dl.tgz -C build/buildroot
 cp -r patches/buildroot/2020.02.3 build/buildroot/patches
-cp build/buildroot/patches/series-lx2162a build/buildroot/patches/series
-pushd build/buildroot && quilt push -a && popd
 FORCE_UNSAFE_CONFIGURE=1 make -C build/buildroot defconfig BR2_DEFCONFIG=patches/config-lx2162a
 FORCE_UNSAFE_CONFIGURE=1 make -C build/buildroot -j 20
