@@ -67,10 +67,10 @@ ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-dest
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-destin make -C build/kernel -j 20
 
 # kernel modules
-mkdir -p build/linux_modules
+mkdir -p build/linux-modules
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-destin make -C build/kernel -j 20 modules
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-destin make -C build/kernel \
-	INSTALL_MOD_PATH=$PWD/build/linux_modules modules_install
+	INSTALL_MOD_PATH=$PWD/build/linux-modules modules_install
 
 # sfc driver module
 mkdir -p build/net-driver
@@ -81,10 +81,10 @@ ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-dest
 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- BOARD=lx2162au26z LOCALVERSION=-destin make \
 	-C build/net-driver/usr/src/sfc-5.3.8.1011 \
 	KPATH=$PWD/build/kernel \
-	INSTALL_MOD_PATH=$PWD/build/linux_modules \
+	INSTALL_MOD_PATH=$PWD/build/linux-modules \
 	INSTALL_MOD_DIR=kernel/drivers/net/ethernet/sfc modules_install
 
-# buildroot
+# buildroot 构建 rootfs
 mkdir -p build/buildroot
 tar xvf downloads/buildroot_2020.02.3.tgz -C build/buildroot
 tar xvf downloads/buildroot-dl.tgz -C build/buildroot
