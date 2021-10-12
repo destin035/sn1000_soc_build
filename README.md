@@ -2,6 +2,56 @@
 
 ![](docs/boot_image.png)
 
+## TF-A 启动流程
+
+Boot ROM -> BL2 -> BL31 -> U-boot/UEFI -> Linux
+
+![](docs/TF-A_boot_flow.jpg)
+
+1. Boot ROM (BL1)
+
+    a. When the CPU is released from reset, hardware executes PBL commands that copy the BL2 binary (`bl2.bin`) for platform initialization to OCRAM. The PBI commands also populate the BOOTLOC ptr to the location where `bl2.bin` is copied.
+
+    b. Upon successful execution of the PBI commands, Boot ROM passes control to the BL2 image at EL3.
+
+2. BL2
+
+    a. Upon successful execution of the PBI commands, Boot ROM passes control to the BL2 image at EL3.
+
+    b. BL2 validates BL31, BL32, and BL33 images to the DDR memory after validating these images. BL31, BL32, and BL33 images form FIP image, fip.bin.
+
+    c. Post validation of all the components of the FIP image, BL2 passes execution control to the EL3 runtime firmware image named as "BL31"
+
+3. BL31
+
+    a. Sets up exception vector table at EL3
+
+    b. Configures security related settings (TZPC)
+
+    c. Provides services to both bootloader and operating system, such as controlling core power state and bringing additional cores out of reset
+
+    d. [Optional] Passes execution control to Trusted OS (OP-TEE) image, BL32, if BL32 image is present.
+
+4. BL32
+
+    a. [Optional] After initialization, BL32 returns control to BL31
+
+5. BL31
+
+    a. Passes execution control to bootloader U-Boot/UEFI, BL33 at EL2
+
+6. BL33
+
+    a. Loads and starts the kernel and other firmware (if any) images.
+
+Secure boot bl2.pbl image
+
+![](docs/bl2_pbl_image.jpg)
+
+Secure boot fip.bin image
+
+![](docs/fip_image.jpg)
+
 ## 构建机环境准备
 
 1. 安装依赖包 (Ubuntu 20.04)
