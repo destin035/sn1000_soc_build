@@ -58,7 +58,8 @@ Secure boot fip.bin image
 
 ```
 sudo apt update
-sudo apt install git quilt wget build-essential gcc-aarch64-linux-gnu rsync device-tree-compiler tcl unzip fakeroot u-boot-tools
+sudo apt install git quilt wget build-essential gcc-aarch64-linux-gnu rsync \
+    device-tree-compiler tcl unzip fakeroot u-boot-tools bison flex
 ```
 
 2. 下载这个项目
@@ -71,7 +72,7 @@ cd sn1000_soc_build
 3. 获取源码压缩包
 
 ```
-wget http://10.10.30.24:8088/s/XnHLYJ79MwSTp6j/download/sn1000_soc_downloads.tar.gz
+wget http://10.10.30.25:8080/s/iBEe6qScEkC6i9w/download/sn1000_soc_downloads.tar.gz
 tar xvf sn1000_soc_downloads.tar.gz
 ```
 
