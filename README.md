@@ -59,7 +59,7 @@ Secure boot fip.bin image
 ```
 sudo apt update
 sudo apt install git quilt wget build-essential gcc-aarch64-linux-gnu rsync \
-    device-tree-compiler tcl unzip fakeroot u-boot-tools bison flex
+    device-tree-compiler tcl unzip fakeroot u-boot-tools bison flex libssl-dev
 ```
 
 2. 下载这个项目
