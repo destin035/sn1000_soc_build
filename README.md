@@ -234,6 +234,8 @@ FORCE_UNSAFE_CONFIGURE=1 make -C build/buildroot -j 20
 cat > build/make_initramfs << EOF
 cpio -i -d -H newc -F $PWD/build/buildroot/output/images/rootfs.cpio --no-absolute-filenames
 echo "sfc" >> /etc/modules
+cp $PWD/patches/initramfs/init init
+chmod +x init
 mkdir -p lib/modules/5.4.3-destin
 cp $PWD/build/linux-modules/lib/modules/5.4.3-destin/modules.* lib/modules/5.4.3-destin
 mkdir -p lib/modules/5.4.3-destin/kernel/drivers/net/ethernet/sfc

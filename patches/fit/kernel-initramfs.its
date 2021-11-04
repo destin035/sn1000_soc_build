@@ -1,0 +1,39 @@
+/dts-v1/;
+/ {
+    description = "arm64 kernel, ramdisk and FDT blob";
+    images {
+        kernel {
+                description = "ARM64 Kernel";
+                data = /incbin/("ZIMAGE_INITRAMFS");
+                type = "kernel";
+                arch = "arm64";
+                os = "linux";
+                compression = "gzip";
+                load = <0x80080000>;
+                entry = <0x80080000>;
+                hash@1 {
+                    algo = "crc32";
+                };
+        };
+        lx2162au26z-dtb {
+            description = "lx2162au26z-dtb";
+            data = /incbin/("DTB");
+            type = "flat_dt";
+            arch = "arm64";
+            os = "linux";
+            compression = "none";
+            load = <0x90000000>;
+            hash@1 {
+                algo = "crc32";
+            };
+        };
+    };
+    configurations {
+        default = "lx2162au26z";
+        lx2162au26z {
+            description = "config for lx2162au26z";
+            kernel = "kernel";
+            fdt = "lx2162au26z-dtb";
+        };
+    };
+};
